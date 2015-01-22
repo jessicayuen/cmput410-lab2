@@ -8,6 +8,35 @@
 
 import socket
 import sys
+import threading
+
+class ClientThread(threading.Thread):
+
+	def __init__(self, conn):
+		super(ClientThread, self).__init__()
+		self.running = True
+		self.conn = conn
+
+	def run(self):
+		while True:
+			data = self.conn.recv(1024)
+
+			if data.rstrip() == chr(27).encode():
+				break
+
+			# To the TA: Please note that I do not need to trim the string
+			# here as in my python environment, the extra characters are 
+			# not being displayed.
+			# i.e. typing 
+			#	Hello
+			# will echo 
+			#	Hello Jessica
+			# and NOT what was seen in the lab of
+			# 	\bHello Jessica\r\n
+			reply = str(data).rstrip() + ' Jessica\n'
+			self.conn.sendall(reply.encode('UTF8'))
+
+		self.conn.close()
 
 try:
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,26 +61,11 @@ print('Socket bind complete.')
 s.listen(10)
 print('Socket is now listening.')
 
-conn, addr = s.accept()
-print('Connected with ' + addr[0] + ':' + str(addr[1]))
-
 while True:
-	data = conn.recv(1024)
+	conn, addr = s.accept()
 
-	if data.rstrip() == 'Esc':
-		break
+	print('Connected with ' + addr[0] + ':' + str(addr[1]))
+	thread = ClientThread(conn)
+	thread.start()
 
-	# To the TA: Please note that I do not need to trim the string
-	# here as in my python environment, the extra characters are 
-	# not being displayed.
-	# i.e. typing 
-	#	Hello
-	# will echo 
-	#	Hello Jessica
-	# and NOT what was seen in the lab of
-	# 	\bHello Jessica\r\n
-	reply = str(data).rstrip() + ' Jessica\n'
-	conn.sendall(reply.encode('UTF8'))
-
-conn.close()
 s.close()
