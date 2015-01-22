@@ -25,16 +25,18 @@ except socket.error:
 print('Socket bind complete.')
 s.listen(10) # Limitation to number of connections that can be in the queue
 print('Socket is now listening.')
-conn, addr = s.accept()	# blocking call, to accept the first client that comes
-print('Connected with ' + addr[0] + ':' + str(addr[1]))
 
-# can type in bash the following to talk to the socket: telnet localhost 8888
+# Part 3 - the while loop to keep the socket listening for clients
+while True:
+	conn, addr = s.accept()	# blocking call, to accept the first client that comes
+	# can type in bash the following to talk to the socket: telnet localhost 8888
 
-# Part 2
-
-data = conn.recv(1024)
-reply = '<<<Hello ' + str(data) + '>>>'
-conn.sendall(reply.encode('UTF8')) 
+	# Part 2
+	data = conn.recv(1024)
+	if not data:
+		break
+	reply = '<<<Hello ' + str(data) + '>>>'
+	conn.sendall(reply.encode('UTF8')) 
 
 # once you start the socket with python sample5.py
 # try telnet localhost 8888 in another terminal
