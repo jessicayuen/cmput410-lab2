@@ -19,7 +19,7 @@ except socket.error as msg:
 print('Socked created successfully.')
 
 host = ''
-port = 8889
+port = 8888
 
 try:
 	s.bind((host, port))
@@ -38,6 +38,9 @@ print('Connected with ' + addr[0] + ':' + str(addr[1]))
 while True:
 	data = conn.recv(1024)
 
+	if data.rstrip() == 'Esc':
+		break
+
 	# To the TA: Please note that I do not need to trim the string
 	# here as in my python environment, the extra characters are 
 	# not being displayed.
@@ -47,7 +50,7 @@ while True:
 	#	Hello Jessica
 	# and NOT what was seen in the lab of
 	# 	\bHello Jessica\r\n
-	reply = str(data).rstrip() + ' Jessica\n' 
+	reply = str(data).rstrip() + ' Jessica\n'
 	conn.sendall(reply.encode('UTF8'))
 
 conn.close()
